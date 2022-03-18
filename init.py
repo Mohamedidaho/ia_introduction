@@ -153,7 +153,7 @@ unique_teams = df['HOME_TEAM_ID'].unique()
 #on conbine les données pour tous les matchs
 all_team_sim_data = {}
 
-#on cheche les matchs disputés par l'equipe
+#on cherche les matchs disputés par l'equipe
 for team_name in unique_teams:
     df_team = df_.loc[(df_['HOME_TEAM_ID'] == team_name) | (df_['VISITOR_TEAM_ID'] == team_name)]
     
@@ -337,9 +337,43 @@ group_list = [
      ('Clippers', 'Mavericks')] # group H      
     
 
-# initiate a playoff
+# instanciation d'un playoff
 playoff = FinalTournament()
-# simulate the playoff 5,000 times
+# simulation pour 5000 playoff
 playoff.simulate(group_list, n_simulation = 5000)
 
 playoff.rounds_probs
+
+#VISUALISATION ET ANALYSE
+def plotting(rounds_data):
+    
+    rounds_stats = list(rounds_data.values())
+    team_names = list(rounds_stats[0].keys())
+    
+    # x is number of rounds used for labels, y is a 2-D array of (n_teams, n_rounds) used for data
+    x = list(rounds_data.keys()) #nombre de tour
+    y = np.array([list(r.values()) for r in rounds_stats]).T 
+    
+    # choix des couleurs pour chaque entité
+    c_1 =  sns.color_palette('tab10', n_colors = 10)
+    c_2 =  sns.color_palette("pastel", n_colors = 10)
+    color_map = c_1 + c_2 
+    
+    fig = plt.figure()
+    plt.stackplot(x, y, labels = team_names, colors = color_map) 
+    plt.legend(bbox_to_anchor=(1.1, 1.1), loc = 'upper left', fontsize=13)
+    plt.xticks(x, fontsize=14)
+    plt.yticks(fontsize=14)
+    plt.xlabel('Round Number', fontsize = 15)
+    plt.title('Winning probabilities by all Teams & Rounds', pad = 20, fontsize = 24)
+    plt.tight_layout()
+    plt.show()
+    
+    return fig
+
+# probabilité de faite par équipe et par manche
+fig = plotting(playoff.rounds)
+
+# Proba de victoire par équipe et manche
+fig = plotting(playoff.rounds_probs)
+
